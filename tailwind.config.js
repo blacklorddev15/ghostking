@@ -2,16 +2,11 @@
 export default {
   content: [
     "./index.html",
-    "./*.{js,ts,jsx,tsx}",
+    "./**/*.{js,ts,jsx,tsx}", // ← FIX: Match all files
   ],
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
         cyan: {
           400: "#22d3ee",
           500: "#06b6d4",
