@@ -36,14 +36,9 @@ export default function Home() {
                   </Link>
                 </>
               ) : (
-                <>
-                  <Link href="/login">
-                    <Button className="bg-gradient-to-r from-cyan-500 to-purple-600 text-sm">Login</Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button variant="outline" className="text-sm">Register</Button>
-                  </Link>
-                </>
+                <Link href="/dashboard">
+                  <Button className="bg-gradient-to-r from-cyan-500 to-purple-600 text-sm">Dashboard</Button>
+                </Link>
               )}
             </div>
           </div>
@@ -63,7 +58,7 @@ export default function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xs sm:max-w-none justify-center">
-            <Link href={isAuthenticated ? "/dashboard" : "/register"}>
+            <Link href="/dashboard">
               <Button className="w-full sm:w-auto px-10 h-14 bg-gradient-to-r from-cyan-500 to-purple-600 text-lg">
                 Get Started <ChevronRight className="ml-2 w-5 h-5 inline" />
               </Button>
@@ -99,9 +94,9 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <Link href={isAuthenticated ? "/products" : "/register"}>
+                <Link href="/dashboard">
                   <Button className="w-full bg-gradient-to-r from-cyan-500 to-purple-600">
-                    {isAuthenticated ? "Deploy Now" : "Get Started"}
+                    Get Started
                   </Button>
                 </Link>
               </Card>
