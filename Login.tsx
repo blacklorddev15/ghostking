@@ -11,12 +11,24 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim()) { toast.error("Please enter a username"); return; }
+    if (!username.trim()) { 
+      toast.error("Please enter a username"); 
+      return; 
+    }
+    
     setIsLoggingIn(true);
+    console.log("Attempting login with:", username);
+    
     try {
-      await login(username.trim());
-      toast.success("Welcome back!");
+      const success = await login(username.trim());
+      console.log("Login success:", success);
+      if (success) {
+        toast.success("Welcome back!");
+        // Force navigation
+        window.location.href = "/dashboard";
+      }
     } catch (err) {
+      console.error("Login error:", err);
       toast.error("Failed to login");
     } finally {
       setIsLoggingIn(false);
@@ -32,28 +44,58 @@ export default function Login() {
         <p className="text-gray-500 text-sm mt-2">Premium Cyberpunk Hosting</p>
       </div>
 
-      <Card className="bg-black/60 border-white/10 p-8 rounded-3xl backdrop-blur-xl">
+      <Card 
+        style={{
+          background: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          padding: '32px',
+          borderRadius: '24px'
+        }}
+      >
         <form onSubmit={handleLogin} className="flex flex-col gap-6">
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Username</label>
-            <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <div style={{ position: 'relative' }}>
+              <User style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', color: '#6b7280' }} />
               <Input
                 value={username}
                 onChange={(e: any) => setUsername(e.target.value)}
                 placeholder="Enter handle"
-                className="pl-12"
+                style={{ paddingLeft: '48px' }}
               />
             </div>
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={isLoggingIn}
-            className="h-14 bg-gradient-to-r from-cyan-500 to-purple-600 text-lg font-bold rounded-2xl"
+            style={{
+              width: '100%',
+              height: '56px',
+              background: 'linear-gradient(135deg, #06b6d4, #7c3aed)',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '18px',
+              borderRadius: '16px',
+              border: 'none',
+              cursor: isLoggingIn ? 'not-allowed' : 'pointer',
+              opacity: isLoggingIn ? 0.5 : 1,
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoggingIn) {
+                e.currentTarget.style.transform = 'scale(1.02)';
+                e.currentTarget.style.boxShadow = '0 0 40px rgba(6, 182, 212, 0.5)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
             {isLoggingIn ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : "Enter Dashboard"}
-          </Button>
+          </button>
         </form>
       </Card>
       

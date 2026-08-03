@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "npx drizzle-kit push && vite build && esbuild index.ts --platform=node --bundle --format=esm --outfile=dist/server.js",
-    "start": "NODE_ENV=production node dist/server.js"
+    "start": "NODE_ENV=production node dist/server.js",
+    "seed": "npx tsx seed.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",
