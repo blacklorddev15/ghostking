@@ -1,6 +1,5 @@
 import { Link } from "wouter";
 import { useAuth } from "./useAuth";
-import { Button, Card } from "./components";
 import { trpc } from "./main";
 
 const STATS = [
@@ -57,13 +56,19 @@ export default function Home() {
   const packages = productsData?.products || [];
 
   return (
-    <div style={{ backgroundColor: '#0a0a0f' }}>
+    <div style={{ minHeight: '100vh', background: '#0a0a0f' }}>
 
-      {/* ─── HERO / LANDING PAGE ─── */}
+      {/* ─── HERO / LANDING PAGE WITH BACKGROUND IMAGE ─── */}
       <section
         className="relative overflow-hidden min-h-screen flex items-center"
         style={{
-          background: 'linear-gradient(180deg, rgba(7,20,40,0.92) 0%, rgba(10,10,15,0.95) 100%)',
+          background: `
+            linear-gradient(180deg, rgba(7,20,40,0.88) 0%, rgba(10,10,15,0.92) 100%),
+            url('./background.jpg')
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
         }}
       >
 
@@ -168,7 +173,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4 sm:px-0 mt-6">
             <Link
               href="/products"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-bold text-white text-base transition-all"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-bold text-white text-base transition-all hover:scale-105"
               style={{
                 background: 'linear-gradient(135deg, #7c3aed, #3b82f6)',
                 boxShadow: '0 0 28px rgba(124,58,237,0.45)',
@@ -181,7 +186,7 @@ export default function Home() {
             </Link>
             <Link
               href={isAuthenticated ? "/dashboard" : "/dashboard"}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-semibold text-sm transition-all"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:scale-105"
               style={{
                 backgroundColor: 'rgba(255,255,255,0.05)',
                 color: '#f0f4ff',
@@ -304,7 +309,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── PRICING ─── */}
+      {/* ─── PRICING / PANELS SECTION ─── */}
       <section className="py-16 sm:py-24" style={{ backgroundColor: '#0d0d1a' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
@@ -408,7 +413,7 @@ export default function Home() {
 
                 <Link
                   href={isAuthenticated ? "/dashboard" : "/dashboard"}
-                  className="block w-full py-2.5 rounded-xl text-sm font-bold text-center transition-all"
+                  className="block w-full py-2.5 rounded-xl text-sm font-bold text-center transition-all hover:scale-105"
                   style={{
                     background: pkg.popular
                       ? 'linear-gradient(135deg, #7c3aed, #3b82f6)'
@@ -479,7 +484,7 @@ export default function Home() {
                   </ul>
                   <Link
                     href={isAuthenticated ? "/dashboard" : "/dashboard"}
-                    className="block w-full py-2.5 rounded-xl text-sm font-bold text-center transition-all"
+                    className="block w-full py-2.5 rounded-xl text-sm font-bold text-center transition-all hover:scale-105"
                     style={{
                       background: pkg.popular ? 'linear-gradient(135deg, #7c3aed, #3b82f6)' : 'transparent',
                       color: pkg.popular ? '#fff' : '#c084fc',
@@ -524,7 +529,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link
               href={isAuthenticated ? "/dashboard" : "/dashboard"}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-white text-base"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-white text-base transition-all hover:scale-105"
               style={{
                 background: 'linear-gradient(135deg, #7c3aed, #3b82f6)',
                 boxShadow: '0 0 28px rgba(124,58,237,0.4)',
@@ -537,7 +542,7 @@ export default function Home() {
             </Link>
             <Link
               href="/products"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold text-sm"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold text-sm transition-all hover:scale-105"
               style={{
                 color: '#94a3b8',
                 border: '1px solid #1e2d4a',

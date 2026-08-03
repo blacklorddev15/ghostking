@@ -4,7 +4,8 @@ import {
   getOrCreateWallet, getWalletBalance, updateWalletBalance, createTransaction, 
   getTransactionHistory, getActiveProducts, getProductById, createOrder, 
   getUserOrders, getAllUsers, getAllTransactions, getAllOrders, 
-  getSettings, getSetting, updateSetting, getAllProducts, updateProduct 
+  getSettings, getSetting, updateSetting, getAllProducts, updateProduct,
+  getUserById
 } from "./db";
 import { TRPCError } from "@trpc/server";
 import axios from "axios";
@@ -89,58 +90,119 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const product = await getProductById(input.productId);
         if (!product) throw new TRPCError({ code: "NOT_FOUND" });
+        
         const totalPrice = (parseFloat(product.price as any) * input.quantity).toFixed(2);
         const balance = await getWalletBalance(ctx.user.id);
+        
+        // Check if user has enough balance
         if (parseFloat(balance) < parseFloat(totalPrice)) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient balance" });
+          throw new TRPCError({ 
+            code: "BAD_REQUEST", 
+            message: `Insufficient balance. You need ${totalPrice} SD but have ${balance} SD` 
+          });
         }
 
         let serviceId = null;
+        let pteroDetails = null;
+
+        // Create Pterodactyl server for panel products
         if (product.category === "panel" && product.eggId) {
           const pteroUrl = await getSetting("pterodactyl_url");
           const pteroKey = await getSetting("pterodactyl_api_key");
+          
           if (pteroUrl && pteroKey) {
             try {
               const pteroClient = axios.create({
                 baseURL: pteroUrl,
-                headers: { 'Authorization': `Bearer ${pteroKey}`, 'Content-Type': 'application/json', 'Accept': 'Application/vnd.pterodactyl.v1+json' }
+                headers: { 
+                  'Authorization': `Bearer ${pteroKey}`, 
+                  'Content-Type': 'application/json', 
+                  'Accept': 'Application/vnd.pterodactyl.v1+json'
+                }
               });
+
+              // Get or create Pterodactyl user
               let pteroUser;
-              const usersRes = await pteroClient.get(`/api/application/users?filter[email]=${ctx.user.email || 'client@ghostking.com'}`);
-              if (usersRes.data.data.length > 0) {
-                pteroUser = usersRes.data.data[0].attributes;
-              } else {
+              const userEmail = ctx.user.email || `${ctx.user.openId}@ghostking.com`;
+              
+              try {
+                const usersRes = await pteroClient.get(`/api/application/users?filter[email]=${userEmail}`);
+                if (usersRes.data.data.length > 0) {
+                  pteroUser = usersRes.data.data[0].attributes;
+                }
+              } catch (e) {
+                console.log("User not found, creating new...");
+              }
+
+              if (!pteroUser) {
                 const newUserRes = await pteroClient.post('/api/application/users', {
-                  email: ctx.user.email || `${ctx.user.openId}@ghostking.com`,
+                  email: userEmail,
                   username: `user_${ctx.user.id}`,
                   first_name: ctx.user.name || "Client",
                   last_name: "GhostKing",
                 });
                 pteroUser = newUserRes.data.attributes;
               }
+
+              // Create the server
               const serverRes = await pteroClient.post('/api/application/servers', {
-                name: `${product.name} - ${ctx.user.name}`,
+                name: `${product.name} - ${ctx.user.name || ctx.user.openId}`,
                 user: pteroUser.id,
                 egg: product.eggId,
+                nest: product.nestId || 1,
                 pack: 0,
                 docker_image: "ghcr.io/pterodactyl/yolks:debian",
                 startup: "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}",
-                limits: { memory: product.memory || 1024, swap: 0, disk: product.disk || 5120, io: 500, cpu: 100 },
-                feature_limits: { databases: 0, backups: 0, allocations: 1 },
-                deploy: { locations: [1], dedicated_ip: false, port_range: [] },
-                environment: { SERVER_JARFILE: "server.jar" },
+                limits: { 
+                  memory: product.memory || 1024, 
+                  swap: 0, 
+                  disk: product.disk || 5120, 
+                  io: 500, 
+                  cpu: product.cpu || 100 
+                },
+                feature_limits: { 
+                  databases: product.databases || 0, 
+                  backups: product.backups || 0, 
+                  allocations: product.allocations || 1 
+                },
+                deploy: { 
+                  locations: [product.locationId || 1], 
+                  dedicated_ip: false, 
+                  port_range: [] 
+                },
+                environment: { 
+                  SERVER_JARFILE: "server.jar",
+                  VERSION: "latest"
+                },
                 start_on_completion: true,
               });
+
               serviceId = serverRes.data.attributes.uuid;
-            } catch (err) {
-              console.error("Ptero Error:", err);
+              pteroDetails = {
+                id: serverRes.data.attributes.id,
+                uuid: serverRes.data.attributes.uuid,
+                name: serverRes.data.attributes.name,
+                status: serverRes.data.attributes.status,
+              };
+
+              console.log("✅ Pterodactyl server created:", pteroDetails);
+
+            } catch (err: any) {
+              console.error("❌ Pterodactyl Error:", err.response?.data || err.message);
+              // Still create order but mark as pending
+              serviceId = null;
             }
+          } else {
+            console.warn("⚠️ Pterodactyl not configured - panel will be pending");
           }
         }
 
+        // Deduct balance
         const newBalance = (parseFloat(balance) - parseFloat(totalPrice)).toFixed(2);
         await updateWalletBalance(ctx.user.id, newBalance);
-        await createOrder({
+
+        // Create order
+        const orderResult = await createOrder({
           userId: ctx.user.id,
           productId: input.productId,
           quantity: input.quantity,
@@ -148,14 +210,23 @@ export const appRouter = router({
           status: serviceId ? "active" : "pending",
           serviceId: serviceId,
         });
+
+        // Create transaction
         await createTransaction({
           userId: ctx.user.id,
           type: "purchase",
           amount: totalPrice as any,
           status: "completed",
-          description: `Purchase: ${product.name}`,
+          description: `Purchase: ${product.name}${serviceId ? ' (Deployed)' : ' (Pending)'}`,
         });
-        return { success: true, newBalance };
+
+        return { 
+          success: true, 
+          newBalance,
+          serviceId,
+          pteroDetails,
+          message: serviceId ? "Panel deployed successfully!" : "Order created, pending deployment"
+        };
       }),
     list: protectedProcedure.query(async ({ ctx }) => {
       const orders = await getUserOrders(ctx.user.id);
