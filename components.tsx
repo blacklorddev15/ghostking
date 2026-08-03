@@ -6,76 +6,46 @@ export const Button = ({
   variant = "primary", 
   ...props 
 }: any) => {
-  // Use inline styles as fallback
-  const styles: any = {
+  // Base styles with inline styles to ensure visibility
+  const baseStyle = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '6px',
+    padding: '12px 20px',
+    borderRadius: '12px',
+    fontWeight: '700',
+    fontSize: '14px',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    textDecoration: 'none',
+  };
+
+  const variants: any = {
     primary: {
       background: 'linear-gradient(135deg, #06b6d4, #7c3aed)',
       color: 'white',
-      padding: '12px 24px',
-      borderRadius: '12px',
-      fontWeight: '700',
-      border: 'none',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
       boxShadow: '0 0 20px rgba(6, 182, 212, 0.3)',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '8px',
-      fontSize: '16px',
-      width: '100%',
     },
     outline: {
       background: 'transparent',
       color: '#22d3ee',
-      padding: '12px 24px',
-      borderRadius: '12px',
-      fontWeight: '700',
       border: '2px solid rgba(6, 182, 212, 0.5)',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '8px',
-      fontSize: '16px',
-      width: '100%',
     },
     ghost: {
-      background: 'transparent',
+      background: 'rgba(255, 255, 255, 0.05)',
       color: '#9ca3af',
-      padding: '12px 24px',
-      borderRadius: '12px',
-      fontWeight: '700',
-      border: 'none',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '8px',
-      fontSize: '16px',
-      width: '100%',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
     },
     danger: {
       background: 'rgba(239, 68, 68, 0.2)',
       color: '#ef4444',
-      padding: '12px 24px',
-      borderRadius: '12px',
-      fontWeight: '700',
       border: '1px solid rgba(239, 68, 68, 0.5)',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '8px',
-      fontSize: '16px',
-      width: '100%',
     },
   };
 
-  const style = styles[variant] || styles.primary;
+  const style = { ...baseStyle, ...variants[variant] };
 
   return (
     <button 
@@ -84,7 +54,7 @@ export const Button = ({
       {...props}
       onMouseEnter={(e) => {
         if (variant === 'primary') {
-          e.currentTarget.style.transform = 'scale(1.05)';
+          e.currentTarget.style.transform = 'scale(1.02)';
           e.currentTarget.style.boxShadow = '0 0 40px rgba(6, 182, 212, 0.5)';
         }
       }}
@@ -107,7 +77,7 @@ export const Card = ({ children, className = "", ...props }: any) => (
       backdropFilter: 'blur(12px)',
       border: '1px solid rgba(255, 255, 255, 0.1)',
       borderRadius: '16px',
-      padding: '24px',
+      padding: '20px',
     }}
     className={className}
     {...props}
