@@ -5,6 +5,7 @@ import Wallet from "./Wallet";
 import Products from "./Products";
 import Admin from "./Admin";
 import Login from "./Login";
+import Register from "./Register";
 import { Toaster } from "sonner";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/wallet" component={Wallet} />
         <Route path="/products" component={Products} />

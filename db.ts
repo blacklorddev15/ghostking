@@ -4,6 +4,7 @@ import pg from "pg";
 import { users, wallets, transactions, products, orders, settings } from "./schema";
 import type { InsertUser, InsertTransaction, InsertOrder } from "./schema";
 import { ENV } from './env';
+import crypto from 'crypto';
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -16,6 +17,16 @@ export async function getDb() {
   return db;
 }
 
+// Hash password
+export function hashPassword(password: string): string {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+// Verify password
+export function verifyPassword(password: string, hash: string): boolean {
+  return hashPassword(password) === hash;
+}
+
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) throw new Error("User openId is required for upsert");
   try {
@@ -24,6 +35,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       set: {
         name: user.name,
         email: user.email,
+        password: user.password,
         loginMethod: user.loginMethod,
         lastSignedIn: new Date(),
         role: user.openId === ENV.ownerOpenId ? 'admin' : user.role
@@ -34,8 +46,25 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 }
 
+export async function createUser(user: InsertUser): Promise<void> {
+  await db.insert(users).values({
+    ...user,
+    password: user.password ? hashPassword(user.password) : undefined,
+  });
+}
+
 export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByEmail(email: string) {
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByUsername(username: string) {
+  const result = await db.select().from(users).where(eq(users.openId, username)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 

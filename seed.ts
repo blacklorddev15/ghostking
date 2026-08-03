@@ -1,0 +1,134 @@
+// seed.ts - in root folder
+import { db } from './db';
+import { products } from './schema';
+import 'dotenv/config';
+
+async function seedProducts() {
+  console.log('🌱 Seeding products...');
+
+  const defaultProducts = [
+    {
+      name: 'Starter Panel',
+      description: 'Perfect for small communities and friends',
+      category: 'panel',
+      price: '5.00',
+      features: JSON.stringify(['1GB RAM', '10GB Storage', '1 Database', 'Community Support']),
+      billingCycle: 'monthly',
+      active: 1,
+      eggId: 1,
+      nestId: 1,
+      memory: 1024,
+      disk: 5120,
+      cpu: 100,
+      databases: 1,
+      backups: 1,
+      allocations: 1,
+    },
+    {
+      name: 'Pro Panel',
+      description: 'Advanced hosting for growing communities',
+      category: 'panel',
+      price: '20.00',
+      features: JSON.stringify(['4GB RAM', '50GB Storage', '5 Databases', 'Priority Support']),
+      billingCycle: 'monthly',
+      active: 1,
+      eggId: 1,
+      nestId: 1,
+      memory: 4096,
+      disk: 10240,
+      cpu: 200,
+      databases: 5,
+      backups: 3,
+      allocations: 5,
+    },
+    {
+      name: 'Enterprise Panel',
+      description: 'Maximum performance for large communities',
+      category: 'panel',
+      price: '50.00',
+      features: JSON.stringify(['16GB RAM', '200GB Storage', 'Unlimited Databases', '24/7 Premium Support']),
+      billingCycle: 'monthly',
+      active: 1,
+      eggId: 1,
+      nestId: 1,
+      memory: 16384,
+      disk: 204800,
+      cpu: 400,
+      databases: 999,
+      backups: 10,
+      allocations: 20,
+    },
+    {
+      name: 'WhatsApp Auto-Bot',
+      description: '24/7 automated WhatsApp engagement bot',
+      category: 'bot',
+      price: '15.00',
+      features: JSON.stringify(['Auto-reply', 'Broadcast Messages', 'Group Management', 'Analytics Dashboard']),
+      billingCycle: 'monthly',
+      active: 1,
+      eggId: null,
+      nestId: null,
+      memory: null,
+      disk: null,
+      cpu: null,
+      databases: null,
+      backups: null,
+      allocations: null,
+    },
+    {
+      name: 'Telegram Auto-Bot',
+      description: '24/7 automated Telegram engagement bot',
+      category: 'bot',
+      price: '15.00',
+      features: JSON.stringify(['Auto-reply', 'Channel Management', 'Custom Commands', 'Analytics Dashboard']),
+      billingCycle: 'monthly',
+      active: 1,
+      eggId: null,
+      nestId: null,
+      memory: null,
+      disk: null,
+      cpu: null,
+      databases: null,
+      backups: null,
+      allocations: null,
+    },
+    {
+      name: 'Minecraft Server',
+      description: 'High-performance Minecraft server hosting',
+      category: 'panel',
+      price: '10.00',
+      features: JSON.stringify(['2GB RAM', '20GB Storage', 'DDoS Protection', 'Console Access']),
+      billingCycle: 'monthly',
+      active: 1,
+      eggId: 2,
+      nestId: 1,
+      memory: 2048,
+      disk: 20480,
+      cpu: 150,
+      databases: 2,
+      backups: 2,
+      allocations: 2,
+    },
+  ];
+
+  for (const product of defaultProducts) {
+    try {
+      await db.insert(products).values(product);
+      console.log(`✅ Added: ${product.name}`);
+    } catch (error: any) {
+      if (error.message?.includes('duplicate') || error.message?.includes('unique constraint')) {
+        console.log(`⚠️ Product "${product.name}" already exists`);
+      } else {
+        console.log(`❌ Error adding ${product.name}:`, error.message);
+      }
+    }
+  }
+
+  console.log('✅ Seeding complete!');
+  process.exit(0);
+}
+
+seedProducts().catch((error) => {
+  console.error('❌ Seeding failed:', error);
+  process.exit(1);
+});

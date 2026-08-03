@@ -1,37 +1,46 @@
 import React, { useState } from "react";
-import { useAuth } from "./useAuth";
-import { Button, Card, Input } from "./components";
-import { Loader2, User } from "lucide-react";
+import { Link } from "wouter";
+import { Card, Input } from "./components";
+import { Loader2, User, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Login() {
   const [username, setUsername] = useState("");
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const { login } = useAuth();
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim()) { 
-      toast.error("Please enter a username"); 
-      return; 
+    
+    if (!username.trim() || !password.trim()) {
+      toast.error("Username and password required");
+      return;
     }
     
-    setIsLoggingIn(true);
-    console.log("Attempting login with:", username);
+    setIsLoading(true);
+    console.log("Login attempt with:", { username });
     
     try {
-      const success = await login(username.trim());
-      console.log("Login success:", success);
-      if (success) {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      const data = await res.json();
+      console.log("Login response:", data);
+      
+      if (res.ok) {
         toast.success("Welcome back!");
-        // Force navigation
         window.location.href = "/dashboard";
+      } else {
+        toast.error(data.error || "Invalid username or password");
       }
     } catch (err) {
       console.error("Login error:", err);
-      toast.error("Failed to login");
+      toast.error("Login failed");
     } finally {
-      setIsLoggingIn(false);
+      setIsLoading(false);
     }
   };
 
@@ -41,7 +50,7 @@ export default function Login() {
         <h1 className="text-4xl font-black bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
           GHOSTKING
         </h1>
-        <p className="text-gray-500 text-sm mt-2">Premium Cyberpunk Hosting</p>
+        <p className="text-gray-500 text-sm mt-2">Welcome back!</p>
       </div>
 
       <Card 
@@ -53,15 +62,29 @@ export default function Login() {
           borderRadius: '24px'
         }}
       >
-        <form onSubmit={handleLogin} className="flex flex-col gap-6">
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Username</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Username or Email</label>
             <div style={{ position: 'relative' }}>
               <User style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', color: '#6b7280' }} />
               <Input
                 value={username}
                 onChange={(e: any) => setUsername(e.target.value)}
-                placeholder="Enter handle"
+                placeholder="Enter username or email"
+                style={{ paddingLeft: '48px' }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Password</label>
+            <div style={{ position: 'relative' }}>
+              <Lock style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', color: '#6b7280' }} />
+              <Input
+                type="password"
+                value={password}
+                onChange={(e: any) => setPassword(e.target.value)}
+                placeholder="Enter your password"
                 style={{ paddingLeft: '48px' }}
               />
             </div>
@@ -69,34 +92,29 @@ export default function Login() {
 
           <button
             type="submit"
-            disabled={isLoggingIn}
+            disabled={isLoading}
             style={{
               width: '100%',
               height: '56px',
+              marginTop: '8px',
               background: 'linear-gradient(135deg, #06b6d4, #7c3aed)',
               color: 'white',
               fontWeight: 'bold',
               fontSize: '18px',
               borderRadius: '16px',
               border: 'none',
-              cursor: isLoggingIn ? 'not-allowed' : 'pointer',
-              opacity: isLoggingIn ? 0.5 : 1,
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              opacity: isLoading ? 0.5 : 1,
               transition: 'all 0.3s ease'
             }}
-            onMouseEnter={(e) => {
-              if (!isLoggingIn) {
-                e.currentTarget.style.transform = 'scale(1.02)';
-                e.currentTarget.style.boxShadow = '0 0 40px rgba(6, 182, 212, 0.5)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
           >
-            {isLoggingIn ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : "Enter Dashboard"}
+            {isLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : "Enter Dashboard"}
           </button>
         </form>
+
+        <p className="text-center text-sm text-gray-500 mt-6">
+          Don't have an account? <Link href="/register"><a className="text-cyan-400 hover:text-cyan-300">Register</a></Link>
+        </p>
       </Card>
       
       <p className="text-center text-[10px] text-gray-600 mt-10 uppercase tracking-widest">
