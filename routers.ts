@@ -56,13 +56,12 @@ export const appRouter = router({
         const currentBalance = await getWalletBalance(ctx.user.id);
         const newBalance = (parseFloat(currentBalance) + parseFloat(amountInSD)).toFixed(2);
         await updateWalletBalance(ctx.user.id, newBalance);
-        // Direct DB update for transaction status
-        const db = await (await import("./db")).getDb();
-        if (db) {
-          const { transactions } = await import("./schema");
-          const { eq } = await import("drizzle-orm");
-          await db.update(transactions).set({ status: "completed", description: `Converted to ${amountInSD} SD` }).where(eq(transactions.reference, input.reference));
-        }
+        
+        const { db } = await import("./db");
+        const { transactions } = await import("./schema");
+        const { eq } = await import("drizzle-orm");
+        await db.update(transactions).set({ status: "completed", description: `Converted to ${amountInSD} SD` }).where(eq(transactions.reference, input.reference as string));
+        
         return { success: true, newBalance };
       }),
   }),
@@ -107,12 +106,12 @@ export const appRouter = router({
                 headers: { 'Authorization': `Bearer ${pteroKey}`, 'Content-Type': 'application/json', 'Accept': 'Application/vnd.pterodactyl.v1+json' }
               });
               let pteroUser;
-              const usersRes = await pteroClient.get(`/api/application/users?filter[email]=${ctx.user.email}`);
+              const usersRes = await pteroClient.get(`/api/application/users?filter[email]=${ctx.user.email || 'client@ghostking.com'}`);
               if (usersRes.data.data.length > 0) {
                 pteroUser = usersRes.data.data[0].attributes;
               } else {
                 const newUserRes = await pteroClient.post('/api/application/users', {
-                  email: ctx.user.email,
+                  email: ctx.user.email || `${ctx.user.openId}@ghostking.com`,
                   username: `user_${ctx.user.id}`,
                   first_name: ctx.user.name || "Client",
                   last_name: "GhostKing",
@@ -123,6 +122,7 @@ export const appRouter = router({
                 name: `${product.name} - ${ctx.user.name}`,
                 user: pteroUser.id,
                 egg: product.eggId,
+                pack: 0,
                 docker_image: "ghcr.io/pterodactyl/yolks:debian",
                 startup: "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}",
                 limits: { memory: product.memory || 1024, swap: 0, disk: product.disk || 5120, io: 500, cpu: 100 },
