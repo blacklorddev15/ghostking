@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
 import { Card, Input } from "./components";
-import { Loader2, User, Lock } from "lucide-react";
+import { Loader2, User, Lock, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -32,13 +33,14 @@ export default function Login() {
       
       if (res.ok) {
         toast.success("Welcome back!");
+        // Force redirect to dashboard
         window.location.href = "/dashboard";
       } else {
         toast.error(data.error || "Invalid username or password");
       }
     } catch (err) {
       console.error("Login error:", err);
-      toast.error("Login failed");
+      toast.error("Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -68,6 +70,7 @@ export default function Login() {
             <div style={{ position: 'relative' }}>
               <User style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', color: '#6b7280' }} />
               <Input
+                type="text"
                 value={username}
                 onChange={(e: any) => setUsername(e.target.value)}
                 placeholder="Enter username or email"
@@ -81,12 +84,29 @@ export default function Login() {
             <div style={{ position: 'relative' }}>
               <Lock style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', color: '#6b7280' }} />
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e: any) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                style={{ paddingLeft: '48px' }}
+                style={{ paddingLeft: '48px', paddingRight: '48px' }}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: '#6b7280',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
           </div>
 

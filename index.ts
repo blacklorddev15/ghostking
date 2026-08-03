@@ -82,13 +82,15 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-// LOGIN endpoint with password
+// LOGIN endpoint with password - FIXED
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
   
-  console.log("Login attempt:", { username });
+  console.log("Login attempt - Username:", username);
+  console.log("Login attempt - Password received:", password ? "Yes (length: " + password.length + ")" : "No");
 
   if (!username || !password) {
+    console.log("Missing username or password");
     return res.status(400).json({ error: "Username and password required" });
   }
 
@@ -100,11 +102,17 @@ app.post("/api/login", async (req, res) => {
     }
 
     if (!user) {
+      console.log("User not found:", username);
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
+    console.log("User found:", user.openId);
+    console.log("Stored password hash:", user.password ? "Yes" : "No");
+    console.log("Password match:", user.password ? verifyPassword(password, user.password) : false);
+
     // Verify password
     if (!user.password || !verifyPassword(password, user.password)) {
+      console.log("Password verification failed");
       return res.status(401).json({ error: "Invalid username or password" });
     }
 
@@ -114,6 +122,8 @@ app.post("/api/login", async (req, res) => {
       path: "/",
       httpOnly: false,
     });
+
+    console.log("Login successful for:", user.openId);
 
     res.json({ 
       success: true, 
@@ -127,7 +137,7 @@ app.post("/api/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ error: "Login failed" });
+    res.status(500).json({ error: "Login failed: " + (error as Error).message });
   }
 });
 
