@@ -1,179 +1,79 @@
 import { useAuth } from "./useAuth";
 import { trpc } from "./main";
-import { Button } from "./components";
-import { Card } from "./components";
+import { Button, Card } from "./components";
 import { Link } from "wouter";
-import { Loader2, Wallet, Package, TrendingUp } from "lucide-react";
+import { Loader2, Wallet, Package, TrendingUp, Plus } from "lucide-react";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
-  const { data: balanceData, isLoading: balanceLoading } = trpc.wallet.getBalance.useQuery(undefined, {
-    enabled: !!user,
-  });
-  const { data: ordersData, isLoading: ordersLoading } = trpc.orders.list.useQuery(undefined, {
-    enabled: !!user,
-  });
+  const { data: balanceData, isLoading: balanceLoading } = trpc.wallet.getBalance.useQuery(undefined, { enabled: !!user });
+  const { data: ordersData, isLoading: ordersLoading } = trpc.orders.list.useQuery(undefined, { enabled: !!user });
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
-      </div>
-    );
-  }
+  if (authLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-cyan-400" /></div>;
 
   const balance = balanceData?.balance || "0.00";
   const orders = ordersData?.orders || [];
   const activeOrders = orders.filter(o => o.status === "active");
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Navigation */}
-      <nav className="border-b border-cyan-500/30 bg-black/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/">
-            <a className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-              BLACKLORD TECH
-            </a>
-          </Link>
-          <div className="flex gap-4">
-            <Link href="/wallet">
-              <Button size="sm" variant="outline" className="border-cyan-500 text-cyan-400">
-                <Wallet className="w-4 h-4 mr-2" />
-                Wallet
-              </Button>
-            </Link>
-            <Link href="/products">
-              <Button size="sm" variant="outline" className="border-cyan-500 text-cyan-400">
-                Products
-              </Button>
-            </Link>
-          </div>
-        </div>
+    <div className="min-h-screen text-white pb-20">
+      <nav className="border-b border-white/10 bg-black/80 backdrop-blur-md sticky top-0 z-50 px-5 py-4 flex justify-between items-center">
+        <Link href="/"><a className="font-bold text-cyan-400">BLACKLORD</a></Link>
+        <Link href="/wallet"><Button className="bg-white/10 text-xs px-3 py-1.5 border border-white/10"><Wallet className="w-3 h-3 mr-1 inline" /> {parseFloat(balance).toFixed(0)} SD</Button></Link>
       </nav>
 
-      <div className="container mx-auto px-4 py-12">
-        {/* Welcome Card */}
-        <Card className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/30 p-8 mb-8">
-          <h1 className="text-4xl font-bold mb-2">Welcome back, {user?.name}! 👋</h1>
-          <p className="text-gray-400">Manage your services, wallet, and deployments from here.</p>
-        </Card>
+      <div className="container mx-auto px-5 py-8 flex flex-col gap-6">
+        <header>
+          <h1 className="text-3xl font-bold">Hello, {user?.name}</h1>
+          <p className="text-gray-400 text-sm">Your services are running smoothly.</p>
+        </header>
 
-        {/* Stats Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {/* Wallet Balance */}
-          <Card className="bg-black/50 border-cyan-500/30 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Wallet Balance</h3>
-              <Wallet className="w-6 h-6 text-cyan-400" />
-            </div>
-            {balanceLoading ? (
-              <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
-            ) : (
-              <>
-                <div className="text-4xl font-bold text-cyan-400 mb-2">
-                  {parseFloat(balance).toLocaleString("en-KE", { minimumFractionDigits: 2 })} SD
-                </div>
-                <Link href="/wallet">
-                  <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700 w-full mt-4">
-                    Top Up Balance
-                  </Button>
-                </Link>
-              </>
-            )}
+        {/* Vertical Stats on Mobile */}
+        <div className="flex flex-col gap-4">
+          <Card className="bg-gradient-to-br from-cyan-600/20 to-black/40 border-cyan-500/30 p-5">
+            <p className="text-xs text-cyan-400 font-medium mb-1 uppercase tracking-wider">Wallet Balance</p>
+            <h2 className="text-3xl font-bold">{parseFloat(balance).toLocaleString()} SD</h2>
+            <Link href="/wallet"><Button className="w-full mt-4 bg-cyan-600 text-sm h-10">Add Funds</Button></Link>
           </Card>
 
-          {/* Active Services */}
-          <Card className="bg-black/50 border-purple-500/30 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Active Services</h3>
-              <Package className="w-6 h-6 text-purple-400" />
-            </div>
-            {ordersLoading ? (
-              <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
-            ) : (
-              <>
-                <div className="text-4xl font-bold text-purple-400 mb-2">
-                  {activeOrders.length}
-                </div>
-                <p className="text-gray-400 text-sm">Running services</p>
-              </>
-            )}
-          </Card>
-
-          {/* Total Spent */}
-          <Card className="bg-black/50 border-cyan-500/30 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Total Spent</h3>
-              <TrendingUp className="w-6 h-6 text-cyan-400" />
-            </div>
-            {ordersLoading ? (
-              <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
-            ) : (
-              <>
-                <div className="text-4xl font-bold text-cyan-400 mb-2">
-                  {orders.reduce((sum, o) => sum + parseFloat(o.totalPrice as any), 0).toLocaleString("en-KE", { minimumFractionDigits: 2 })} SD
-                </div>
-                <p className="text-gray-400 text-sm">Lifetime purchases</p>
-              </>
-            )}
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <Link href="/products">
-              <Button className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 h-12">
-                🚀 Deploy New Service
-              </Button>
-            </Link>
-            <Link href="/wallet">
-              <Button className="w-full bg-gradient-to-r from-purple-500 to-cyan-600 hover:from-purple-600 hover:to-cyan-700 h-12">
-                💳 Deposit Funds
-              </Button>
-            </Link>
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="bg-black/40 border-white/10 p-4">
+              <Package className="w-5 h-5 text-purple-400 mb-2" />
+              <p className="text-[10px] text-gray-500 uppercase">Services</p>
+              <p className="text-xl font-bold">{activeOrders.length}</p>
+            </Card>
+            <Card className="bg-black/40 border-white/10 p-4">
+              <TrendingUp className="w-5 h-5 text-green-400 mb-2" />
+              <p className="text-[10px] text-gray-500 uppercase">Spent</p>
+              <p className="text-xl font-bold">{orders.reduce((s, o) => s + parseFloat(o.totalPrice as any), 0).toFixed(0)}</p>
+            </Card>
           </div>
         </div>
 
-        {/* Active Services List */}
-        {activeOrders.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Your Active Services</h2>
-            <div className="space-y-4">
-              {activeOrders.map(order => (
-                <Card key={order.id} className="bg-black/50 border-cyan-500/30 p-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="font-semibold text-lg">Service #{order.id}</h3>
-                      <p className="text-gray-400 text-sm">Product ID: {order.productId}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-cyan-400">
-                        {parseFloat(order.totalPrice as any).toLocaleString("en-KE", { minimumFractionDigits: 2 })} SD
-                      </div>
-                      <span className="inline-block bg-green-500/20 text-green-400 px-3 py-1 rounded text-sm mt-2">
-                        {order.status}
-                      </span>
-                    </div>
+        <section>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Your Services</h2>
+            <Link href="/products"><Button className="bg-white/10 text-xs py-1 px-3"><Plus className="w-3 h-3 mr-1 inline" /> New</Button></Link>
+          </div>
+
+          {ordersLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (
+            <div className="flex flex-col gap-3">
+              {activeOrders.length > 0 ? activeOrders.map(order => (
+                <Card key={order.id} className="bg-black/60 border-white/10 p-4 flex justify-between items-center">
+                  <div>
+                    <p className="font-bold text-sm">Panel #{order.id}</p>
+                    <p className="text-[10px] text-gray-500">{order.serviceId?.slice(0, 8) || 'Provisioning...'}</p>
                   </div>
+                  <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded uppercase font-bold">Active</span>
                 </Card>
-              ))}
+              )) : (
+                <div className="text-center py-10 text-gray-500 text-sm border-2 border-dashed border-white/5 rounded-2xl">
+                  No active services yet.
+                </div>
+              )}
             </div>
-          </div>
-        )}
-
-        {activeOrders.length === 0 && (
-          <Card className="bg-black/50 border-cyan-500/30 p-8 text-center">
-            <p className="text-gray-400 mb-4">No active services yet</p>
-            <Link href="/products">
-              <Button className="bg-gradient-to-r from-cyan-500 to-purple-600">
-                Browse Products
-              </Button>
-            </Link>
-          </Card>
-        )}
+          )}
+        </section>
       </div>
     </div>
   );

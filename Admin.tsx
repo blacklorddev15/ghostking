@@ -90,7 +90,7 @@ export default function Admin() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen  flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
       </div>
     );
@@ -106,9 +106,9 @@ export default function Admin() {
     .reduce((sum: number, t: any) => sum + parseFloat(t.amount), 0);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen  text-white">
       {/* Navigation */}
-      <nav className="border-b border-cyan-500/30 bg-black/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b border-cyan-500/30 /80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/">
             <a className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
@@ -133,7 +133,7 @@ export default function Admin() {
 
         {/* Key Metrics */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-black/50 border-cyan-500/30 p-6">
+          <Card className="/50 border-cyan-500/30 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-gray-400 mb-2">Total Users</div>
@@ -143,7 +143,7 @@ export default function Admin() {
             </div>
           </Card>
 
-          <Card className="bg-black/50 border-purple-500/30 p-6">
+          <Card className="/50 border-purple-500/30 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-gray-400 mb-2">Total Orders</div>
@@ -153,7 +153,7 @@ export default function Admin() {
             </div>
           </Card>
 
-          <Card className="bg-black/50 border-cyan-500/30 p-6">
+          <Card className="/50 border-cyan-500/30 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-gray-400 mb-2">Total Revenue</div>
@@ -165,7 +165,7 @@ export default function Admin() {
             </div>
           </Card>
 
-          <Card className="bg-black/50 border-purple-500/30 p-6">
+          <Card className="/50 border-purple-500/30 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-gray-400 mb-2">Total Deposits</div>
@@ -181,7 +181,7 @@ export default function Admin() {
         {/* Management Sections */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Link href="/admin/users">
-            <Card className="bg-black/50 border-cyan-500/30 hover:border-cyan-500/60 transition p-6 cursor-pointer">
+            <Card className="/50 border-cyan-500/30 hover:border-cyan-500/60 transition p-6 cursor-pointer">
               <div className="flex items-center gap-4">
                 <Users className="w-12 h-12 text-cyan-400" />
                 <div>
@@ -193,7 +193,7 @@ export default function Admin() {
           </Link>
 
           <Link href="/admin/transactions">
-            <Card className="bg-black/50 border-purple-500/30 hover:border-purple-500/60 transition p-6 cursor-pointer">
+            <Card className="/50 border-purple-500/30 hover:border-purple-500/60 transition p-6 cursor-pointer">
               <div className="flex items-center gap-4">
                 <TrendingUp className="w-12 h-12 text-purple-400" />
                 <div>
@@ -205,7 +205,7 @@ export default function Admin() {
           </Link>
 
           <Link href="/admin/orders">
-            <Card className="bg-black/50 border-cyan-500/30 hover:border-cyan-500/60 transition p-6 cursor-pointer">
+            <Card className="/50 border-cyan-500/30 hover:border-cyan-500/60 transition p-6 cursor-pointer">
               <div className="flex items-center gap-4">
                 <Package className="w-12 h-12 text-cyan-400" />
                 <div>
@@ -218,7 +218,7 @@ export default function Admin() {
         </div>
 
         {/* Pterodactyl Settings */}
-        <Card className="bg-black/50 border-cyan-500/30 p-8 mb-8">
+        <Card className="/50 border-cyan-500/30 p-8 mb-8">
           <div className="flex items-center gap-3 mb-6">
             <Settings className="w-6 h-6 text-cyan-400" />
             <h2 className="text-2xl font-bold">Pterodactyl & System Settings</h2>
@@ -232,7 +232,7 @@ export default function Admin() {
                     value={settings['pterodactyl_url'] || ''} 
                     onChange={(e) => setSettings({...settings, pterodactyl_url: e.target.value})}
                     placeholder="https://panel.yourdomain.com"
-                    className="bg-black/50 border-cyan-500/30"
+                    className="/50 border-cyan-500/30"
                   />
                   <Button size="icon" onClick={() => handleSaveSetting('pterodactyl_url')} disabled={isSaving}>
                     <Save className="w-4 h-4" />
@@ -247,7 +247,7 @@ export default function Admin() {
                     value={settings['pterodactyl_api_key'] || ''} 
                     onChange={(e) => setSettings({...settings, pterodactyl_api_key: e.target.value})}
                     placeholder="ptla_..."
-                    className="bg-black/50 border-cyan-500/30"
+                    className="/50 border-cyan-500/30"
                   />
                   <Button size="icon" onClick={() => handleSaveSetting('pterodactyl_api_key')} disabled={isSaving}>
                     <Save className="w-4 h-4" />
@@ -263,7 +263,7 @@ export default function Admin() {
                     value={settings['default_location_id'] || ''} 
                     onChange={(e) => setSettings({...settings, default_location_id: e.target.value})}
                     placeholder="1"
-                    className="bg-black/50 border-cyan-500/30"
+                    className="/50 border-cyan-500/30"
                   />
                   <Button size="icon" onClick={() => handleSaveSetting('default_location_id')} disabled={isSaving}>
                     <Save className="w-4 h-4" />
@@ -277,7 +277,7 @@ export default function Admin() {
                     value={settings['conversion_rate'] || ''} 
                     onChange={(e) => setSettings({...settings, conversion_rate: e.target.value})}
                     placeholder="5"
-                    className="bg-black/50 border-cyan-500/30"
+                    className="/50 border-cyan-500/30"
                   />
                   <Button size="icon" onClick={() => handleSaveSetting('conversion_rate')} disabled={isSaving}>
                     <Save className="w-4 h-4" />
@@ -289,7 +289,7 @@ export default function Admin() {
         </Card>
 
         {/* Product Management */}
-        <Card className="bg-black/50 border-purple-500/30 p-8 mb-8">
+        <Card className="/50 border-purple-500/30 p-8 mb-8">
           <div className="flex items-center gap-3 mb-6">
             <Package className="w-6 h-6 text-purple-400" />
             <h2 className="text-2xl font-bold">Product & Price Management</h2>
@@ -314,7 +314,7 @@ export default function Admin() {
                         <Input 
                           value={editingProduct.name} 
                           onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})}
-                          className="bg-black/50 border-purple-500/30 h-8 text-xs"
+                          className="/50 border-purple-500/30 h-8 text-xs"
                         />
                       ) : product.name}
                     </td>
@@ -324,7 +324,7 @@ export default function Admin() {
                           type="number"
                           value={editingProduct.price} 
                           onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value})}
-                          className="bg-black/50 border-purple-500/30 h-8 text-xs w-20"
+                          className="/50 border-purple-500/30 h-8 text-xs w-20"
                         />
                       ) : `${product.price} SD`}
                     </td>
@@ -335,13 +335,13 @@ export default function Admin() {
                             placeholder="Egg"
                             value={editingProduct.eggId || ''} 
                             onChange={(e) => setEditingProduct({...editingProduct, eggId: e.target.value})}
-                            className="bg-black/50 border-purple-500/30 h-8 text-xs w-12"
+                            className="/50 border-purple-500/30 h-8 text-xs w-12"
                           />
                           <Input 
                             placeholder="Nest"
                             value={editingProduct.nestId || ''} 
                             onChange={(e) => setEditingProduct({...editingProduct, nestId: e.target.value})}
-                            className="bg-black/50 border-purple-500/30 h-8 text-xs w-12"
+                            className="/50 border-purple-500/30 h-8 text-xs w-12"
                           />
                         </div>
                       ) : `E:${product.eggId} / N:${product.nestId}`}
@@ -353,13 +353,13 @@ export default function Admin() {
                             placeholder="RAM"
                             value={editingProduct.memory || ''} 
                             onChange={(e) => setEditingProduct({...editingProduct, memory: e.target.value})}
-                            className="bg-black/50 border-purple-500/30 h-8 text-xs w-16"
+                            className="/50 border-purple-500/30 h-8 text-xs w-16"
                           />
                           <Input 
                             placeholder="Disk"
                             value={editingProduct.disk || ''} 
                             onChange={(e) => setEditingProduct({...editingProduct, disk: e.target.value})}
-                            className="bg-black/50 border-purple-500/30 h-8 text-xs w-16"
+                            className="/50 border-purple-500/30 h-8 text-xs w-16"
                           />
                         </div>
                       ) : `${product.memory}MB / ${product.disk}MB`}
@@ -386,7 +386,7 @@ export default function Admin() {
         {/* Recent Activity */}
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Recent Orders */}
-          <Card className="bg-black/50 border-cyan-500/30 p-6">
+          <Card className="/50 border-cyan-500/30 p-6">
             <h3 className="text-xl font-bold mb-4">Recent Orders</h3>
             <div className="space-y-3">
               {orders.slice(0, 5).map((order: any) => (
@@ -409,7 +409,7 @@ export default function Admin() {
           </Card>
 
           {/* Recent Transactions */}
-          <Card className="bg-black/50 border-purple-500/30 p-6">
+          <Card className="/50 border-purple-500/30 p-6">
             <h3 className="text-xl font-bold mb-4">Recent Deposits</h3>
             <div className="space-y-3">
               {transactions
